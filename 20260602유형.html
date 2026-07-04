@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>손해보험·제3보험 모집인 등록자격시험 모의고사</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .orange-point { color: #f37021; }
+        .bg-orange-point { background-color: #f37021; }
+        .border-orange-point { border-color: #f37021; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col justify-between">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 px-4 py-3 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-2">
+            <span class="bg-orange-point text-white text-xs font-bold px-2 py-1 rounded">한화손보 가이드</span>
+            <h1 class="font-bold text-sm text-gray-700">모집인 자격시험 모의고사 6-2</h1>
+        </div>
+        <div id="user-display" class="text-xs text-gray-500 font-medium hidden"></div>
+    </header>
+
+    <main class="flex-grow container mx-auto max-w-md p-4 flex flex-col justify-center">
+
+        <section id="screen-start" class="bg-white rounded-2xl shadow-md p-6 border border-gray-100 text-center">
+            <h2 class="text-2xl font-black mb-1 tracking-tight">손해보험 · 제3보험</h2>
+            <p class="text-sm font-bold text-gray-400 mb-6">모집인 등록자격시험 모의고사 (6-2)</p>
+            
+            <div class="bg-gray-50 rounded-xl p-4 mb-6 text-left border border-gray-200/60">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">📝 테스트 진행 순서 안내</h3>
+                <div class="relative pl-6 border-l-2 border-orange-500/30 space-y-4 text-xs">
+                    <div class="relative">
+                        <span class="absolute -left-[31px] top-0 bg-orange-point text-white w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]">1</span>
+                        <p class="font-bold text-gray-700">모의고사 풀이 <span class="text-gray-400 font-normal">(총 50문항, 1문항씩 노출)</span></p>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute -left-[31px] top-0 bg-gray-300 text-gray-600 w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]" id="tl-step-2">2</span>
+                        <p class="font-bold text-gray-700">실시간 과목별 분할 채점 <span class="text-gray-400 font-normal">(손보/제3보 개별 판정)</span></p>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute -left-[31px] top-0 bg-gray-300 text-gray-600 w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]" id="tl-step-3">3</span>
+                        <p class="font-bold text-gray-700">정·오답 대조 완벽 학습 <span class="text-gray-400 font-normal">(슬라이드형 오답노트 필수 확인)</span></p>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute -left-[31px] top-0 bg-gray-300 text-gray-600 w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]" id="tl-step-4">4</span>
+                        <p class="font-bold text-gray-700">취약지점 극복 재시험 <span class="text-gray-400 font-normal">(틀린문제만 / 전체 재시도)</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-4">
+                <label class="block text-xs font-bold text-gray-500 text-left">훈련생 성명을 입력해 주세요</label>
+                <input type="text" id="input-name" placeholder="홍길동" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-center font-bold text-lg">
+            </div>
+
+            <button onclick="startExam()" class="w-full bg-orange-point hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all text-base tracking-wide">테스트 시작하기 ➔</button>
+        </section>
+
+        <section id="screen-exam" class="hidden flex-col justify-between h-full flex-grow">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span id="quiz-category" class="text-xs font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded"></span>
+                    <span id="quiz-progress-text" class="text-xs font-bold text-orange-500"></span>
+                </div>
+                <div class="w-full bg-gray-200 h-1.5 rounded-full mb-4">
+                    <div id="quiz-progress-bar" class="bg-orange-point h-1.5 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
+                    <div class="flex items-start space-x-2 mb-3">
+                        <span id="question-num" class="font-extrabold text-lg text-orange-500 leading-tight"></span>
+                        <h3 id="question-text" class="font-bold text-base text-gray-800 leading-snug"></h3>
+                    </div>
+                    <div id="options-container" class="space-y-2.5">
+                        </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-3 mt-2">
+                <button id="btn-prev" onclick="prevQuestion()" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition-colors disabled:opacity-40" disabled>이전</button>
+                <button id="btn-next" onclick="nextQuestion()" class="w-2/3 bg-orange-point text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition-all shadow-md">다음 ➔</button>
+            </div>
+        </section>
+
+        <section id="screen-result" class="hidden bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+            <h2 class="text-xl font-black text-center mb-1">시험 결과 리포트</h2>
+            <p class="text-xs text-gray-400 text-center mb-4" id="result-date"></p>
+
+            <div id="result-badge" class="text-center py-4 rounded-xl mb-5 font-black text-2xl tracking-wide shadow-inner"></div>
+
+            <div class="grid grid-cols-2 gap-4 mb-5">
+                <div class="p-3.5 bg-gray-50 rounded-xl border border-gray-200/80 text-center">
+                    <p class="text-xs font-bold text-gray-400 mb-0.5">손해보험 (1~33번)</p>
+                    <p id="score-sonbo" class="text-2xl font-black text-gray-800"></p>
+                    <span id="status-sonbo" class="inline-block mt-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full"></span>
+                </div>
+                <div class="p-3.5 bg-gray-50 rounded-xl border border-gray-200/80 text-center">
+                    <p class="text-xs font-bold text-gray-400 mb-0.5">제3보험 (18~50번)</p>
+                    <p id="score-제3보" class="text-2xl font-black text-gray-800"></p>
+                    <span id="status-제3보" class="inline-block mt-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full"></span>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-xs font-bold text-gray-500 mb-1.5">📋 아래 박스를 터치하면 결과 문구가 자동 선택됩니다</label>
+                <textarea id="share-text" readonly onclick="this.select();" class="w-full h-32 p-3 text-xs bg-yellow-50/60 border border-dashed border-yellow-400 rounded-xl font-mono text-gray-700 resize-none focus:outline-none focus:ring-0"></textarea>
+            </div>
+
+            <button onclick="openReviewNote()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all text-base tracking-wide flex items-center justify-center space-x-2">
+                <span>🔍 오답노트 확인 및 학습완료하기</span>
+            </button>
+        </section>
+
+        <section id="screen-review" class="hidden flex-col justify-between h-full flex-grow">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-extrabold bg-red-100 text-red-600 px-2 py-1 rounded">오답노트 학습 모드</span>
+                    <span id="review-progress-text" class="text-xs font-bold text-gray-500"></span>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
+                    <div class="flex items-start space-x-2 mb-4">
+                        <span id="review-question-num" class="font-extrabold text-lg text-red-500 leading-tight"></span>
+                        <h3 id="review-question-text" class="font-bold text-base text-gray-800 leading-snug"></h3>
+                    </div>
+                    
+                    <div id="review-options-container" class="space-y-3 mb-4">
+                        </div>
+
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-900">
+                        <p class="font-extrabold mb-1">💡 [공식 원문 해설]</p>
+                        <p id="review-explanation" class="leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-3 mt-2">
+                <button id="btn-review-prev" onclick="prevReview()" class="w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition-colors disabled:opacity-40" disabled>이전</button>
+                <button id="btn-review-next" onclick="nextReview()" class="w-2/3 bg-red-500 text-white font-bold py-3 rounded-xl hover:bg-red-600 transition-all shadow-md">다음 확인 ➔</button>
+            </div>
+        </section>
+
+        <section id="screen-final" class="hidden bg-white rounded-2xl shadow-md p-6 border border-gray-100 text-center">
+            <div class="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">✓</div>
+            <h2 class="text-xl font-black mb-1 text-gray-800">오답 검토 학습이 만료되었습니다!</h2>
+            <p class="text-xs text-gray-400 mb-6 leading-relaxed">틀린 영역을 마스터하기 위해 목표에 맞는<br>재시험 유형을 선택하세요.</p>
+
+            <div class="space-y-3">
+                <button onclick="startRetestWrongOnly()" id="btn-retest-wrong" class="w-full bg-orange-point hover:bg-orange-600 text-white font-black py-4 rounded-xl shadow-md transition-all text-base">❌ 틀린 문항만 다시 풀기</button>
+                <button onclick="startRetestAll()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3.5 rounded-xl shadow-sm transition-all text-sm">🔄 처음부터 전체 다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-4 text-[10px] text-gray-400 border-t border-gray-100 bg-white">
+        © 2026 한화손해보험 자격시험 모바일 교육 지원 시스템. All rights reserved.
+    </footer>
+
+    <script>
+        // Full Question Bank Array Object Definition
+        const originalQuestionBank = [
+            { id: 1, text: "화재보험에서 보상하는 손해에 해당하지 않는 것은?", options: ["옆집의 화재사고로 주택 내 가재도구가 불에 타서 파손되었다", "갑작스러운 추위로 수도관이 파열되어 가재도구가 침수되었다", "벼락으로 인하여 냉장고가 파손되었다", "피보험자의 채무자가 악의를 품고 방화하여 건물의 일부가 소실되었다"], ans: 2, category: "손해보험 (공통)", desc: "화재로 기인하지 않은 수도관, 수관 수압기 등의 파열로 생긴 손해는 보상하지 않습니다." },
+            { id: 2, text: "화재보험에서 계약 전 알릴 의무의 내용에 해당하지 않는 것은?", options: ["보험의 목적, 수용 건물구조 및 용도", "저장품의 종류 및 성질", "건물 내 영위직업 또는 작업", "보험의 목적이 동일한지 여부와 상관없이 가입한 모든 보험계약"], ans: 4, category: "손해보험 (공통)", desc: "동일한 보험의 목적에 대한 다른 보험계약 가입(중복보험) 여부가 계약 전 알릴 의무에 해당합니다." },
+            { id: 3, text: "화재보험의 특별약관으로 담보하는 위험에 해당하지 않는 것은?", options: ["풍수재위험", "구내폭발위험", "도난위험", "다른 자동차로 인한 위험"], ans: 4, category: "손해보험 (공통)", desc: "다른 자동차로 인한 위험은 화재보험의 특별약관으로 담보하는 위험에 해당하지 않습니다." },
+            { id: 4, text: "배상책임보험에서 보상하지 않는 경우에 해당하는 것은?", options: ["피보험자가 피해자의 손해에 대해 법률상 배상책임을 부담하게 되는 경우", "계약자 또는 피보험자가 손해의 방지 또는 경감을 위하여 비용을 지출한 경우", "계약자, 피보험자 또는 이들의 법정대리인의 고의로 생긴 손해에 대한 배상책임을 부담하게 되는 경우", "계약자, 피보험자 또는 이들의 법정대리인의 과실로 생긴 손해에 대한 배상책임을 부담하게 되는 경우"], ans: 3, category: "손해보험 (공통)", desc: "배상책임보험은 피보험자 등의 과실로 타인에게 피해를 가한 경우에 보상하지만 고의에 의한 경우는 보상하지 않습니다." },
+            { id: 5, text: "여행보험의 기본계약(보통약관)에서 보상하는 손해에 해당하는 것은?", options: ["배상책임손해", "휴대품손해", "특별비용", "상해사고 손해"], ans: 4, category: "손해보험 (공통)", desc: "여행보험의 보통약관은 보험기간 중에 생긴 상해사고(사망·후유장해)를 보장합니다." },
+            { id: 6, text: "장기손해보험의 선납할인제도에 대한 설명으로 알맞은 것은?", options: ["장기손해보험 이외에 화재보험, 자동차보험 등에도 적용된다", "선납보험료에 대한 할인은 보험계약대출이율을 적용한다", "3개월 이상의 보험료를 미리 납부하는 경우에 적용된다", "저축보험료(적립보험료)에 적용되는 제도이다"], ans: 3, category: "손해보험 (공통)", desc: "장기손해보험의 선납할인제도는 3개월 이상의 보험료를 미리 납부하는 경우 보험료를 예정이율로 할인하여 적용하는 제도입니다." },
+            { id: 7, text: "장기손해보험의 위험보험료에 대한 설명으로 맞는 것은?", options: ["부가보험료에는 위험보험료와 저축보험료가 포함된다", "사고발생시 보험금지급의 재원이 된다", "특별계정에서 운용한다", "보험회사에 필요한 사업비이다"], ans: 2, category: "손해보험 (공통)", desc: "위험보험료는 사고발생 시 보험금 지급의 재원이 됩니다. 부가보험료는 사업비이며 저축보험료는 특별계정에서 운용됩니다." },
+            { id: 8, text: "다음 문장 중 괄호 안에 들어갈 말로 알맞은 것은: '( )은/는 장래의 보험금 또는 환급금 등의 지급의 책임을 완전히 이행할 수 있도록 보험계약자로부터 받는 보험료의 일정금액을 적립하여 두는 금액으로 「보험업법」에서 반드시 적립하도록 규정되어 있다'", options: ["만기환급금", "기납입보험료", "계약자적립액", "저축보험료"], ans: 3, category: "손해보험 (공통)", desc: "장기손해보험의 법정 적립금인 계약자적립액에 대한 설명입니다." },
+            { id: 9, text: "장기화재보험에서 보험증권에 기재하여야만 보험의 목적이 되는 물건(명기물건)에 해당하지 않는 것은?", options: ["통화, 유가증권, 인지, 우표 및 이와 비슷한 것", "귀금속, 귀중품(무게나 부피가 휴대할 수 있으며 점당 300만원 이상), 보옥, 보석, 글·그림, 골동품, 조각물 및 이와 비슷한 것", "원고, 설계서, 도안, 물건의 원본, 모형, 증서, 장부, 금형(쇠틀), 목형(나무틀), 소프트웨어 및 이와 비슷한 것", "실외 및 옥외에 쌓아둔 동산을 제외한 가재도구"], ans: 4, category: "손해보험 (공통)", desc: "가재도구는 보험증권 기재 없이도 자동적으로 보장 대상이 되는 자동담보물건에 속합니다. 반면 실외 및 옥외 동산은 명기물건입니다." },
+            { id: 10, text: "연금수령시 종합과세가 적용되는 기준으로 맞는 것은?", options: ["소득세 과세대상 연금소득의 합계가 연간 1,500만원을 초과하는 경우", "소득세 과세대상 연금 외 소득의 합계가 연간 1,200만원을 초과하는 경우", "연금계좌에서 인출하는 금액이 소득공제를 받지 못하는 금액을 포함하여 1,500만원을 초과하는 경우", "소득공제대상 연금소득의 합계가 연간 1,500만원 이하인 경우"], ans: 1, category: "손해보험 (공통)", desc: "소득세 과세대상 사적연금소득의 합계가 연간 1,500만 원을 초과하면 종합과세 또는 16.5% 분리과세 중 선택 적용됩니다." },
+            { id: 11, text: "연금저축에서 연금수령시 연금수령요건을 충족하지 못하는 경우 적용되는 기타소득세율로 알맞은 것은?", options: ["12%", "13%", "14%", "15%"], ans: 4, category: "손해보험 (공통)", desc: "연금수령요건을 채우지 못한 인출분은 15%(지방소득세 별도)의 기타소득세가 부과됩니다." },
+            { id: 12, text: "사용자가 부담금을 나누어 납부하고, 근로자가 적립금의 운용방법을 결정하는 퇴직연금제도는?", options: ["확정기여형 (DC)", "확정급여형 (DB)", "확정기여형 및 확정급여형 혼합형", "개인형퇴직연금 (IRP)"], ans: 1, category: "손해보험 (공통)", desc: "근로자가 운용 방향을 결정하고 그 결과에 책임을 지는 것은 확정기여형(DC) 퇴직연금입니다." },
+            { id: 13, text: "자동차보험에서 일반 적용의 경우 보험회사의 의무보험 책임이 개시되는 시기로 알맞은 것은?", options: ["보험계약 체결일", "보험계약 성립일", "이전 계약의 보험기간이 끝나는 시점", "보험료 납입일"], ans: 3, category: "손해보험 (공통)", desc: "자동차의무보험은 기존 계약이 연장선상에 있는 등 중복 가입될 시 이전 계약의 보험기간이 끝나는 시점부터 책임이 시작됩니다." },
+            { id: 14, text: "자동차보험에서 의무보험 가입의무를 면제받을 수 있는 경우에 대한 설명으로 틀린 것은?", options: ["운전면허 정지기간 중 다른 사람이 당해 자동차를 운행할 수 있는 상태인 경우 가입의무를 면제받을 수 없다", "외국에 체류 중인 경우 의무보험 가입의무가 면제되지 않는다", "차량을 도난당한 경우에는 별도의 입증절차 없이 가입의무가 면제된다", "공휴일 기간 중 만료된 계약의 경우 미가입에 대한 과태료 부과대상이 된다"], ans: 3, category: "손해보험 (공통)", desc: "도난 차량은 관할경찰서에 신고한 서류가 확인 및 입증된 일자 이후부터 비로소 가입의무가 면제됩니다." },
+            { id: 15, text: "다음 중 자동차보험료의 분할납입특약에 대한 설명으로 틀린 것은?", options: ["의무보험료는 분할납입이 가능하고 자동갱신된다", "비연속 2회납, 연속 2, 3, 4, 5, 6회납이 있다", "지정계좌의 이체가능금액이 청구보험료에 미달하는 경우 보험료가 이체되지 않는다", "영업용의 경우 대인배상Ⅰ 및 대물배상도 분할납입 할 수 있다"], ans: 1, category: "손해보험 (공통)", desc: "대인Ⅰ 및 의무대물 등 의무보험료는 성격상 일시에 전액 납입해야 하며 분할할 수 없습니다." },
+            { id: 16, text: "다음 중 자동차보험의 부상보험금 중 간병비에 대한 설명으로 맞는 것은?", options: ["간병비는 정액으로 일괄 지급된다", "동일한 사고로 부모 중 1인이 사망한 7세 미만의 자에 대해서는 최대 60일 한도로 실제 입원기간 동안 간병비를 지급한다", "책임보험 상해구분상 1~5급에 해당하는 자만 대상자에 해당한다", "모든 사고에 대해 간병비를 지급한다"], ans: 2, category: "손해보험 (공통)", desc: "간병비 대상은 상해 1~5급자 및 부모가 1~5급 상해 또는 사망을 당한 7세 미만의 자녀를 한도로 실 입원기간(최대 60일) 보상합니다." },
+            { id: 17, text: "자동차손해배상보장사업에 대한 설명으로 틀린 것은?", options: ["보장사업업무를 지도, 감독하는 기관은 금융위원회 이다", "뺑소니차나 무보험차 사고로 사망하거나 부상당한 피해자가 어디에서도 보상받지 못할 경우 정부에서 보상하는 사회보장제도이다", "차량 낙하물 사고 피해자도 보장사업 대상에 해당한다", "청구권자는 사망의 경우 상속권자이며 부상 또는 장애의 경우 피해자 본인이다"], ans: 1, category: "손해보험 (공통)", desc: "자동차손해배상 정부보장사업을 주관하고 지휘·감독하는 중앙 기관은 국토교통부입니다." },
+            
+            // 공통구간 및 손보/제3보 중복 매핑 포인트 (18번~33번)
+            { id: 18, text: "보험계약의 단계별 설명의무에 대한 설명 중 틀린 것은?", options: ["단계별 설명의무는 보험계약 체결 권유, 보험계약 체결, 보험금 청구, 보험금 심사·지급 단계로 구분된다", "모집종사자의 보험계약 체결대리권 존재여부는 보험계약 체결 권유단계에서 설명하여야 한다", "보험계약 체결단계에서 보험계약의 승낙절차 등을 설명하여야 한다", "단계별 설명의무 중 보험계약 체결 권유단계에서 해약환급금에 관한 사항을 설명하여야 한다"], ans: 2, category: "손해 · 제3보험 공통", desc: "모집종사자의 체결대리권 여부나 고지의무 수령권 존재여부는 권유단계가 아닌 '보험계약 체결단계'에서 설명할 핵심 의무입니다." },
+            { id: 19, text: "보험계약 체결단계에서 제공해야 하는 보험안내자료에 해당하지 않는 것은?", options: ["계약서(계약자 보관용 청약서)", "약관", "설명서", "보험계약관리내용"], ans: 4, category: "손해 · 제3보험 공통", desc: "보험계약관리내용은 체결단계가 아니라, 계약이 체결되어 사업연도 만료일 기준 1년 이상 유지 중인 계약자에게 사후 제공하는 자료입니다." },
+            { id: 20, text: "다음에서 보험계약의 체결 또는 모집에 관한 금지행위에 해당하지 않는 것은?", options: ["보험계약자와 대출 관계를 이용하여 보험계약을 청약하게 하는 행위", "보험상품의 중요한 사항에 대하여 부실한 사항을 보험회사에 알릴 것을 권유하는 행위", "보험계약자에게 보험상품 내용의 중요한 사항을 알리지 않는 행위", "보험계약자의 자필서명을 권고하는 행위"], ans: 4, category: "손해 · 제3보험 공통", desc: "보험계약자 본인의 자필서명을 강력히 권고하고 직접 받도록 안내하는 것은 완전판매를 위한 핵심 필수 이행 사항입니다." },
+            { id: 21, text: "「손해보험 공정경쟁질서유지에 관한 상호협정」에서 금지하고 있는 행위로 맞는 것은?", options: ["보험금 지급민원", "특별이익 제공약속", "보험계약 인수거절", "수수료 지급민원"], ans: 2, category: "손해 · 제3보험 공통", desc: "일정 한도를 초과하거나 기준서류에 명시되지 않은 특별이익 제공 및 사전약속 행위는 상호협정상 엄격한 위반 행위입니다." },
+            { id: 22, text: "다음 중 보험설계사에 대한 설명으로 틀린 것은?", options: ["계약체결권이 없다", "보험료수령권이 없으나 초회 보험료수령권을 인정하는 대법원 판례가 있다", "「보험업법」에 따라 금융위원회에 등록하여야 하나 현재는 등록에 관한 업무를 위탁받은 협회에서 등록 사무를 처리하고 있다", "고지의무수령권이 있다"], ans: 4, category: "손해 · 제3보험 공통", desc: "보험설계사는 독점적인 고지의무수령권이 없습니다. 고지는 회사나 명시적 대리 수령권이 있는 대리점 등에게 해야 법적 효력이 발생합니다." },
+            { id: 23, text: "전속보험설계사에 대한 설명으로 맞는 것은?", options: ["1개 보험회사에 소속되어 그 보험회사의 상품만 판매하는 보험설계사", "1개 종목만의 보험상품을 판매하는 보험설계사", "생명보험상품만 판매하는 보험설계사", "손해보험상품만 판매하는 보험설계사"], ans: 1, category: "손해 · 제3보험 공통", desc: "일사전속의 원칙에 따라 단 1개의 손해보험사 또는 생명보험사에 완전 소속되어 소속 회사의 상품만을 중개하는 설계사를 의미합니다." },
+            { id: 24, text: "다음에서 보험대리점의 영업보증금에 대한 설명으로 틀린 것은?", options: ["대리점 계약을 체결한 보험회사에 영업보증금을 예탁해야 한다", "금융위원회는 보험계약자 보호 등을 위해 필요하다고 인정하는 경우 영업보증금의 증액을 명할 수 있다", "금융기관보험대리점에 대해서는 영업보증금 예탁 의무가 면제된다", "법인보험대리점의 영업보증금 규모는 1억원 한도 내에서 보험회사와 협의하여 정할 수 있다"], ans: 4, category: "손해 · 제3보험 공통", desc: "법인보험대리점의 법정 영업보증금 한도는 1억 원이 아니라 최대 3억 원 범위 내에서 보험회사와의 협의 하에 정합니다." },
+            { id: 25, text: "교차모집설계사에 대한 금지사항으로 알맞지 않은 것은?", options: ["업무상 알게 된 특정 보험회사의 정보를 다른 보험 회사에 제공하는 행위", "모집을 위탁한 보험회사 중 어느 일방의 보험회사만을 위하여 모집하는 행위", "교차모집 계약을 위해 보험계약 내용을 조회하는 행위", "보험회사가 정한 수수료 수당 외에 추가로 대가를 요구하는 행위"], ans: 3, category: "손해 · 제3보험 공통", desc: "적법한 절차와 본인 동의 범위 내에서 정당한 교차모집 계약 체결을 위해 계약 내용을 확인 및 조회하는 행위는 제한대상이 아닙니다." },
+            { id: 26, text: "다음 중 위험에 대한 설명으로 옳지 않은 것은?", options: ["주관적 위험은 자신의 직감 등을 통한 위험을 말한다", "객관적 위험은 기업의 위험관리자에게 매우 유용한 개념이다", "주관적 위험은 구체화되고 명확한 자료를 근거로 한다", "객관적 위험은 대수의 법칙에 근거한 위험이다"], ans: 3, category: "손해 · 제3보험 공통", desc: "주관적 위험은 개인적 감정이나 직감에 기반하므로 이를 뒷받침할 구체적인 통계나 명확한 수치 자료가 부재한 것이 일반적 특징입니다." },
+            { id: 27, text: "기업휴지보험에서 보상하는 손해로 맞는 것은?", options: ["경쟁사의 신제품 출시에 의한 매출액 감소 손해", "보험사고로 공장건물이 파손되어 입은 직접손해", "보험사고로 공장가동이 중단되어 입은 간접손해 (영업이익 손실)", "갑작스러운 매출감소로 인한 손해"], ans: 3, category: "손해 · 제3보험 공통", desc: "기업휴지보험은 화재 등 직접 담보사고로 공장 가동이 멈춰 입게 되는 영업이익 상실 등의 2차적 간접손해를 집중 보장합니다." },
+            { id: 28, text: "음주운전에 대한 처벌규정으로 맞는 것은?", options: ["음주운전으로 인한 사망사고의 경우 20년 이상의 징역에 처한다", "혈중알코올농도가 0.03%~0.08% 미만인 경우 벌점 100점을 부과한다", "음주운전으로 2회 이상의 위반이 있는 경우 15년 이상의 징역에 처한다", "음주측정을 거부하는 경우 10년 이상의 징역에 처한다"], ans: 2, category: "손해 · 제3보험 공통", desc: "도로교통법상 혈중알코올농도 0.03% 이상 0.08% 미만 상태로 단속될 시 운전면허 100일 정지에 상응하는 벌점 100점이 주어집니다." },
+            { id: 29, text: "음주운전 대인사고를 위험운전치사상죄로 규정하고 있는 법률로 알맞은 것은?", options: ["자동차손해배상보장법", "도로교통법", "특정범죄가중처벌법", "교통사고처리특례법"], ans: 3, category: "손해 · 제3보험 공통", desc: "음주운전 중 인명 사상사고를 유발한 가해자를 처벌 가중하고 강력 규정하는 주된 법률은 특정범죄가중처벌법입니다." },
+            { id: 30, text: "다음 중 피보험자의 보험금청구권 소멸시효는?", options: ["2년", "3년", "1년", "5년"], ans: 2, category: "손해 · 제3보험 공통", desc: "상법 및 약관상 계약자·피보험자의 보험금청구권 및 환급금청구권의 소멸시효 완료 기한은 총 3년입니다. (회사의 보험료청구권은 2년)" },
+            { id: 31, text: "보험가입금액과 보험가액이 정확히 일치하는 경우의 보상 방법으로 알맞은 것은?", options: ["비례보상", "실손보상(연대비례)", "실손보상(비례)", "실손보상 (전부보험 실손적용)"], ans: 4, category: "손해 · 제3보험 공통", desc: "보험가액과 보험가입금액의 크기가 같은 형태를 '전부보험'이라 하며, 가입금액 한도 내에서 손해액 전부를 실손보상합니다." },
+            { id: 32, text: "다음 중 보험약관에 대한 설명으로 틀린 것은?", options: ["약관은 대량·반복적인 거래의 신속·간편합리적인 처리로 거래비용을 절감하는 기능이 있다", "보통약관은 특별약관에 우선하여 해석한다", "약관에는 보통약관과 특별약관이 있다", "특별약관은 보통약관의 내용을 보완 또는 변경, 특정 위험의 선택적 가입 등에 사용된다"], ans: 2, category: "손해 · 제3보험 공통", desc: "보통약관과 내용이 배치되거나 특정한 조항이 신설된 특별약관(특약)이 보통약관보다 최우선적으로 적용 및 해석됩니다." },
+            { id: 33, text: "보험사업의 허가에 대한 설명으로 맞는 것은?", options: ["보험업법에 따라 보험종목별로 금융감독원의 허가를 받아야 한다", "보험업법상 보험업 허가 종목은 생명보험, 손해보험, 상해보험이다", "보험사업의 허가를 받은 외국보험회사의 국내지점은 보험업법상 보험회사로 본다", "보험사업의 허가를 받은 외국보험회사의 국내지점은 별도의 보험사업 허가를 받아야 한다"], ans: 3, category: "손해 · 제3보험 공통", desc: "대한민국 내에서 정상적으로 금융위원회의 허가를 획득하여 영업을 개시한 외국보험회사의 한국 국내 지점은 법률상 정식 보험회사 지위가 인정됩니다." },
+            
+            // 제3보험 전용 단독 출제 구간 (34번~50번)
+            { id: 34, text: "제3보험의 특징에 대한 설명으로 틀린 것은?", options: ["원칙적으로 피보험이익이 존재하지 않는다", "정액보상의 성격으로 인해 중복(초과)보험이 존재한다", "대표적인 정액급부로 사망 후유장애 담보가 있다", "정액보상과 실손보상이 모두 가능하다"], ans: 2, category: "제3보험 단독", desc: "중복보험 및 초과보험의 법적 성격은 실제 입은 재산상 실손해를 초과 분담하여 지급하는 '실손보상급부'가 적용될 때 논해집니다." },
+            { id: 35, text: "보험계약의 특징에 대한 설명으로 틀린 것은?", options: ["제3보험은 신체의 상해, 질병, 간병상태를 보험계약의 대상으로 한다", "생명보험은 사람의 생존, 사망을 보험계약의 대상으로 한다", "손해보험은 재산상의 손해를 보험계약의 대상으로 한다", "제3보험은 사전에 미리 정한 금액을 보상하는 것이 원칙이다"], ans: 4, category: "제3보험 단독", desc: "제3보험은 미리 정한 약정액을 주는 '정액보상'과 병원비 실비를 환급해주는 '실손보상'이 유연하게 융합되어 상존하는 특징을 지닙니다." },
+            { id: 36, text: "다음 중 제3보험의 법정 보험종목 분류체계에 해당하지 않는 것은?", options: ["연금보험", "간병보험", "질병보험", "상해보험"], ans: 1, category: "제3보험 단독", desc: "보험업법상 제3보험 영역은 오직 상해보험, 질병보험, 간병보험의 세 부문으로만 획정 및 세분화됩니다. (연금보험은 생명보험 영역)" },
+            { id: 37, text: "제3보험의 상품개발기준에 대한 설명으로 틀린 것은?", options: ["보장성보험에 한하여 개발이 가능하다", "주계약이 상해보험인 경우는 15년 이내의 보험기간으로 저축성보험의 개발이 가능하다", "정액을 보장하는 상품만 설계할 수 있고 실제 발생하는 손해를 보상하는 상품설계는 불가능하다", "실제 손해를 보상하는 위험담보의 경우 다른 회사의 가입내역을 고지의무 사항으로 추가할 수 있다"], ans: 3, category: "제3보험 단독", desc: "제3보험은 규정상 설계 방향에 맞춰 정액보상형 상품과 실손보상형 상품 구조 모두 정밀하게 개발해 낼 수 있습니다." },
+            { id: 38, text: "상해사고의 성립 요건에 대한 설명으로 알맞은 것은?", options: ["외래성이란 원인 또는 결과가 예견되지 않는 상태를 의미한다", "우연성, 외래성, 급격성 중 2가지 요건을 충족하면 상해사고가 된다", "신체허약, 질병 등은 외래성을 충족한다", "급격성이란 결과의 발생을 피할 수 없을 정도로 급박한 상태를 의미한다"], ans: 4, category: "제3보험 단독", desc: "급격성이란 진행이나 결과 도출 속도가 완만하지 않고 피할 겨를 없이 갑작스럽고 급박하게 충격이 도래함을 뜻합니다. 3요건 모두 동시 충족 필수입니다." },
+            { id: 39, text: "다음 지문 속 괄호 안에 알맞은 단어는: '상해보험에서 보험계약자가 보험계약이 체결된 후 피보험자 이외의 자로 보험수익자를 지정 또는 변경하는 경우 ( )의 동의를 받아야 하며 이를 보험자에게 통지하여야 한다'", options: ["보험계약자", "보험회사", "피보험자", "보험수익자"], ans: 3, category: "제3보험 단독", desc: "신체의 주체이자 보장의 객체인 피보험자의 생명 권익 유지를 위해 수익자 변경 시 반드시 피보험자의 서면 동의를 구해야 합니다." },
+            { id: 40, text: "다음 중 상해보험의 특징에 대한 설명으로 틀린 것은?", options: ["실손해를 보상하는 다수 보험가입시 보험가입금액을 한도로 비례보상한다", "피보험자의 중대한 과실로 사망시에도 사망보험금을 지급한다", "보험가입금액과 보험가액을 설정할 수 있다", "피보험자의 권리를 해치지 아니하는 범위 안에서 보험자 대위권을 허용한다"], ans: 3, category: "제3보험 단독", desc: "상해보험은 물건이 아닌 사람의 신체를 객체로 삼으므로, 가액을 화폐 단위로 사전 산정하는 '보험가액' 개념이 애초에 성립 불가능합니다." },
+            { id: 41, text: "상해보험의 실손의료비 보장상품에서 면책사항이 아닌 보상하는 손해에 해당하는 것은?", options: ["치과치료, 한방치료에서 발생한 비급여 의료비", "상해치료와 무관한 건강검진 비용", "건강보험에서 사전 또는 사후에 환급이 가능한 의료비", "지진 등 천재지변으로 인한 상해 치료비"], ans: 4, category: "제3보험 단독", desc: "일반 손해보험 화재보험과 달리, 제3보험 상해보험에서는 지진, 해일, 낙뢰 등 자연재해 및 천재지변으로 유발된 상해 치료비도 책임 보상합니다." },
+            { id: 42, text: "다음 중 상해보험의 입원·수술급여금에 대한 설명으로 틀린 것은?", options: ["수술비는 매 사고마다 지급한다", "동일한 상해의 치료를 직접 목적으로 2회 이상 입원한 경우 이를 1회 입원으로 보아 입원일수를 더한다", "동일한 상해를 직접적인 원인으로 동시에 2회 이상의 수술을 받은 경우에는 1회에 한하여 보상한다", "피보험자가 입원하여 치료를 받던 중 보험기간이 끝난 경우 보상도 종료된다"], ans: 4, category: "제3보험 단독", desc: "보장 책임 기간 중 적법하게 입원하여 지속 치료하던 상태에서 만기가 도래하더라도, 퇴원 전까지 일정 기한(통상 180일) 내 계속 입원비는 정상 보장됩니다." },
+            { id: 43, text: "상해보험에서 지급하는 수술급여금에 대한 실무적 설명으로 맞는 것은?", options: ["미용성형을 목적으로 수술을 받은 경우 보상한다", "고의사고에 의한 상해로 수술을 받은 경우 보상한다", "동일한 상해로 동시에 2가지 이상의 수술을 받은 경우에는 1가지 수술에 한하여 보상한다", "동일한 상해로 동시에 2가지 이상의 수술을 받은 경우에는 2가지 수술 모두 보상한다"], ans: 3, category: "제3보험 단독", desc: "동일 사고 부위 및 연계된 동일 목적으로 두 종류 이상의 중복 수술 집도 시에는 최고액을 주는 1가지 수술보상금 지급을 원칙으로 삼습니다." },
+            { id: 44, text: "다음 중 가입 가이드상 '3대비급여' 항목 특약에 해당하지 않는 범주는?", options: ["암치료를 목적으로 지출한 비급여 치료비", "도수치료 · 체외충격파치료 · 증식치료", "자기공명영상진단 (MRI/MRA)", "비급여 주사료 항목"], ans: 1, category: "제3보험 단독", desc: "실손의료비의 법정 3대 비급여 특약 구성원은 도수·체외충격파·증식치료, 비급여 주사료, 자기공명영상진단(MRI/MRA)으로 한정됩니다." },
+            { id: 45, text: "개인 실손의료보험(4세대)에서 급여 상해 및 질병입원 시 적용되는 연간 본인부담금 상한액 총액 한도는?", options: ["500만원", "300만원", "200만원", "100만원"], ans: 3, category: "제3보험 단독", desc: "4세대 실손의료비 기준 가입자의 급여 입원 의료비 연간 본인부담금 총 합산액은 최대 200만 원까지만 상한선으로 부과 청구됩니다." },
+            { id: 46, text: "다음 중 단체실손의료보험과 개인실손의료보험의 연계제도에 대한 설명으로 맞는 것은?", options: ["단체실손의료보험 가입시 개인실손의료보험은 자동으로 중지된다", "단체실손의료보험 가입시 기존에 가입한 개인실손의료보험의 보험료는 계속 납입하여야 한다", "단체실손의료보험 가입시 기존에 가입한 개인실손의료보험의 중복된 보장을 중지할 수 있다", "단체실손의료보험과 개인실손의료보험에 중복 가입된 경우 단체실손의료보험의 보험료는 환급되지 않는다"], ans: 3, category: "제3보험 단독", desc: "취업 등으로 단체실손에 매핑될 경우 중복 지출 방지를 위해 기존 유지하던 개인 실손의료보험 특약을 매칭하여 일시 납입 및 보장 중지 신청이 가능합니다." },
+            { id: 47, text: "뺑소니 · 무보험차 상해보험에서 보장 및 책임 처리하는 손해에 해당하는 것은?", options: ["가해 자동차가 2대 이상인 경우에 그 중 1대가 무보험자동차일 때에 보상한다", "피보험자가 무보험차에 의한 사고로 의수에 입은 손해를 보상한다", "피보험자가 보유불명의 자동차에 의한 사고로 상해를 입고 경찰서에 뺑소니사고로 신고되어 자동차손해배상보장법상의 보유불명자동차에 의한 사고로 손해배상금을 받을 수 있는 경우 보상한다", "피보험자가 자동차를 영업목적으로 운전하던 중 발생한 무보험차 상해사고는 보상한다"], ans: 3, category: "제3보험 단독", desc: "원인 차량 식별이 불가한 완전 뺑소니 사고 유형으로 적법한 공적 경찰서 신고 절차를 밟고 자배법상 신체 피해 요건 충족 시 약관 보상 처리됩니다." },
+            { id: 48, text: "암보험에서 책임개시 전 역선택 방지를 위한 '대기기간(면책기간)'을 설정할 수 있는 계약 대상 요건은?", options: ["18세 이상자가 암보험에 가입한 경우", "기타피부암을 보장하는 경우", "경계성종양을 보장하는 경우", "대장점막내암을 보장하는 경우"], ans: 1, category: "제3보험 단독", desc: "만 15세 미만 어린이 가입자는 대기기간(90일 면책)을 적용하지 못하므로, 18세 이상 성인이 신규 체결 시 정상 적용 및 설정 대상입니다." },
+            { id: 49, text: "일반 · 노후 실손의료보험에서 가입심사 항목에 대한 설명으로 틀린 것은?", options: ["최근 3개월간 질병 확정진단 여부", "최근 3개월간 질병 의심소견 여부", "최근 3개월간 약물 상시복용 여부", "최근 5년간 추가진단 여부"], ans: 4, category: "제3보험 단독", desc: "최근 5년간 입원, 수술, 7일 이상 치료, 30일 이상 투약 여부 및 암, 백혈병, 고혈압, 당뇨병, 심근경색 등 10대 질병의 진단, 치료, 입원, 수술, 투약 여부가 가입심사 항목에 해당합니다." },
+            { id: 50, text: "노인장기요양보험 체계와 연동하여 장기요양등급(1~4등급 등) 판정을 받을 경우 약정된 장기요양급여금을 지급하는 제3보험 상품명은?", options: ["노후 실손의료보험", "장기간병보험", "장기질병보험", "소득지원보험"], ans: 2, category: "제3보험 단독", desc: "공적 등급 판정 시 약정 일시금이나 매월 간병 간호 보조비를 수령하는 제3보험 핵심 상품 카테고리는 장기간병보험입니다." }
+        ];
+
+        let quizQuestions = []; // Array used for the current round
+        let currentQuestionIdx = 0;
+        let userAnswers = {}; // Map of index -> option clicked
+        let userName = "";
+        let mode = "exam"; // exam, review
+        let wrongIndices = []; // Holds indices of incorrectly answered questions
+        let reviewIdx = 0;
+        let hasCompletedReview = false;
+
+        // Start Examination Trigger Function
+        function startExam() {
+            const nameInput = document.getElementById("input-name").value.trim();
+            if(!nameInput) {
+                alert("훈련생 성명을 정확히 입력하셔야 시험이 시작됩니다.");
+                return;
+            }
+            userName = nameInput;
+            document.getElementById("user-display").innerText = "훈련생: " + userName;
+            document.getElementById("user-display").classList.remove("hidden");
+
+            // Setup Full Set for Main Exam
+            quizQuestions = [...originalQuestionBank];
+            currentQuestionIdx = 0;
+            userAnswers = {};
+            mode = "exam";
+            
+            document.getElementById("screen-start").classList.add("hidden");
+            document.getElementById("screen-exam").classList.remove("hidden");
+            renderQuestion();
+        }
+
+        // Render Single Question UI Component
+        function renderQuestion() {
+            if(quizQuestions.length === 0) return;
+            const q = quizQuestions[currentQuestionIdx];
+
+            // Setup Categories and Progress Elements
+            document.getElementById("quiz-category").innerText = q.category;
+            document.getElementById("quiz-progress-text").innerText = (currentQuestionIdx + 1) + " / " + quizQuestions.length;
+            
+            const pct = ((currentQuestionIdx + 1) / quizQuestions.length) * 100;
+            document.getElementById("quiz-progress-bar").style.width = pct + "%";
+
+            // Set texts using correct raw numbers
+            document.getElementById("question-num").innerText = "Q" + q.id + ".";
+            document.getElementById("question-text").innerText = q.text;
+
+            // Generate Interactive Option Rows
+            const container = document.getElementById("options-container");
+            container.innerHTML = "";
+
+            q.options.forEach((opt, idx) => {
+                const optNum = idx + 1;
+                const button = document.createElement("button");
+                button.className = "w-full text-left p-3.5 border rounded-xl font-medium text-sm flex items-center space-x-3 transition-all duration-200 ";
+                
+                // Keep Selection State Style
+                if(userAnswers[currentQuestionIdx] === optNum) {
+                    button.className += "border-orange-500 bg-orange-50 text-orange-900 font-bold ring-2 ring-orange-500/20 shadow-sm";
+                } else {
+                    button.className += "border-gray-200 bg-white hover:bg-gray-50 text-gray-700";
+                }
+
+                button.onclick = () => selectOption(optNum);
+
+                button.innerHTML = `
+                    <span class="w-5 h-5 rounded-full flex items-center justify-center border font-bold text-xs shrink-0 ${userAnswers[currentQuestionIdx] === optNum ? 'bg-orange-500 text-white border-transparent' : 'bg-gray-100 text-gray-500 border-gray-300'}">${optNum}</span>
+                    <span class="leading-tight">${opt}</span>
+                `;
+                container.appendChild(button);
+            });
+
+            // Handle Nav Bars Disabling
+            document.getElementById("btn-prev").disabled = (currentQuestionIdx === 0);
+            if(currentQuestionIdx === quizQuestions.length - 1) {
+                document.getElementById("btn-next").innerText = "제출 및 채점하기 ✔";
+                document.getElementById("btn-next").className = "w-2/3 bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-900 transition-all shadow-md";
+            } else {
+                document.getElementById("btn-next").innerText = "다음 ➔";
+                document.getElementById("btn-next").className = "w-2/3 bg-orange-point text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition-all shadow-md";
+            }
+        }
+
+        // Store Answer and Proceed Automatically
+        function selectOption(num) {
+            userAnswers[currentQuestionIdx] = num;
+            renderQuestion();
+        }
+
+        function prevQuestion() {
+            if(currentQuestionIdx > 0) {
+                currentQuestionIdx--;
+                renderQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if(!userAnswers[currentQuestionIdx]) {
+                alert("현재 문항의 답안 선지를 선택하셔야 이동할 수 있습니다.");
+                return;
+            }
+
+            if(currentQuestionIdx < quizQuestions.length - 1) {
+                currentQuestionIdx++;
+                renderQuestion();
+            } else {
+                // Last question submitted -> calculate grade scores
+                evaluateTestResult();
+            }
+        }
+
+        // Complex Split-Subject Grading Business Logic
+        function evaluateTestResult() {
+            // Setup target counters
+            let countSonboTotal = 0; let countSonboCorrect = 0;
+            let count제3보Total = 0; let count제3보Correct = 0;
+
+            wrongIndices = []; // reset array entries
+            let sonboWrongNums = [];
+            let 제3보WrongNums = [];
+
+            quizQuestions.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = (userAns === q.ans);
+
+                if(!isCorrect) {
+                    wrongIndices.push(idx);
+                }
+
+                // Split Range Assessment Mapping Rule
+                // Sonbo: Question ID 1 to 33
+                if(q.id >= 1 && q.id <= 33) {
+                    countSonboTotal++;
+                    if(isCorrect) countSonboCorrect++;
+                    else sonboWrongNums.push(q.id);
+                }
+                // 제3보: Question ID 18 to 50
+                if(q.id >= 18 && q.id <= 50) {
+                    count제3보Total++;
+                    if(isCorrect) count제3보Correct++;
+                    else 제3보WrongNums.push(q.id);
+                }
+            });
+
+            // Convert scores to 100 max scale standard values
+            const finalSonboScore = Math.round((countSonboCorrect / countSonboTotal) * 100);
+            const final제3보Score = Math.round((count제3보Correct / count제3보Total) * 100);
+
+            const isSonboPass = finalSonboScore >= 60;
+            const is제3보Pass = final제3보Score >= 60;
+            const isFinalPass = isSonboPass && is제3보Pass;
+
+            // UI Elements Rendering Updates
+            document.getElementById("result-date").innerText = "평가 일시: " + new Date().toLocaleString('ko-KR');
+            
+            const badge = document.getElementById("result-badge");
+            if(isFinalPass) {
+                badge.innerText = "★ 최종 합격 ★";
+                badge.className = "text-center py-4 rounded-xl mb-5 font-black text-2xl tracking-wide shadow-inner bg-green-50 text-green-600 border border-green-200";
+            } else {
+                badge.innerText = "불합격 (과락 발생)";
+                badge.className = "text-center py-4 rounded-xl mb-5 font-black text-2xl tracking-wide shadow-inner bg-red-50 text-red-600 border border-red-200";
+            }
+
+            document.getElementById("score-sonbo").innerText = finalSonboScore + "점";
+            const lblSonbo = document.getElementById("status-sonbo");
+            lblSonbo.innerText = isSonboPass ? "합격" : "과락";
+            lblSonbo.className = isSonboPass ? "inline-block mt-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-green-100 text-green-700" : "inline-block mt-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-red-100 text-red-700";
+
+            document.getElementById("score-제3보").innerText = final제3보Score + "점";
+            const lbl제3보 = document.getElementById("status-제3보");
+            lbl제3보.innerText = is제3보Pass ? "합격" : "과락";
+            lbl제3보.className = is제3보Pass ? "inline-block mt-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-green-100 text-green-700" : "inline-block mt-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-red-100 text-red-700";
+
+            // Format Output Content Textarea String Block
+            const wrongSonboStr = sonboWrongNums.length > 0 ? sonboWrongNums.join("번, ") + "번" : "없음";
+            const wrong제3보Str = 제3보WrongNums.length > 0 ? 제3보WrongNums.join("번, ") + "번" : "없음";
+
+            const shareMessage = `[한화손보 모의고사 6-2 결과]\n훈련생: ${userName}\n결과: ${isFinalPass ? '★최종합격★' : '불합격(과락)'}\n▶ 손해보험: ${finalSonboScore}점 (${isSonboPass ? '합격' : '과락'})\n▶ 제3보험: ${final제3보Score}점 (${is제3보Pass ? '합격' : '과락'})\n❌ 틀린 문항\n- 손보 틀린번호: ${wrongSonboStr}\n- 제3보 틀린번호: ${wrong제3보Str}`;
+            document.getElementById("share-text").value = shareMessage;
+
+            // Screen Switching Control
+            document.getElementById("screen-exam").classList.add("hidden");
+            document.getElementById("screen-result").classList.remove("hidden");
+
+            // Update Timeline Step styling indicator on active path
+            document.getElementById("tl-step-2").className = "absolute -left-[31px] top-0 bg-orange-point text-white w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]";
+        }
+
+        // Open Slidable Review Note Controller
+        function openReviewNote() {
+            if(wrongIndices.length === 0) {
+                alert("축하합니다! 틀린 문제가 없습니다. 최종 화면으로 바로 이동합니다.");
+                hasCompletedReview = true;
+                showFinalScreen();
+                return;
+            }
+            mode = "review";
+            reviewIdx = 0;
+            document.getElementById("screen-result").classList.add("hidden");
+            document.getElementById("screen-review").classList.remove("hidden");
+            renderReviewSlide();
+
+            document.getElementById("tl-step-3").className = "absolute -left-[31px] top-0 bg-orange-point text-white w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]";
+        }
+
+        // Render Interactive Checkers inside Slide Notebook Overlay
+        function renderReviewSlide() {
+            const targetBankIdx = wrongIndices[reviewIdx];
+            const q = quizQuestions[targetBankIdx];
+            const userSelection = userAnswers[targetBankIdx];
+
+            document.getElementById("review-progress-text").innerText = (reviewIdx + 1) + " / " + wrongIndices.length + " (틀린 문항 검토)";
+            document.getElementById("review-question-num").innerText = "Q" + q.id + ".";
+            document.getElementById("review-question-text").innerText = q.text;
+
+            const container = document.getElementById("review-options-container");
+            container.innerHTML = "";
+
+            q.options.forEach((opt, idx) => {
+                const optNum = idx + 1;
+                const div = document.createElement("div");
+                div.className = "p-3 rounded-xl text-xs font-medium flex items-center justify-between border ";
+
+                let iconSymbol = "";
+                // Scoring background color parsing rules matching user choices layout
+                if(optNum === q.ans) {
+                    // Correct Option Layout (Green bg)
+                    div.className += "bg-green-50 border-green-300 text-green-900 font-bold";
+                    iconSymbol = "<span class='text-green-600 font-bold text-sm'>⭕ 정답 선지</span>";
+                } else if(optNum === userSelection) {
+                    // Wrong Choice Made by User Box Layout (Red bg)
+                    div.className += "bg-red-50 border-red-300 text-red-900 font-bold";
+                    iconSymbol = "<span class='text-red-500 font-bold text-sm'>❌ 내가 고른 오답</span>";
+                } else {
+                    // Default Neutral Options Rows
+                    div.className += "bg-white border-gray-100 text-gray-500";
+                    iconSymbol = `<span class='text-gray-300 text-xs'>${optNum}</span>`;
+                }
+
+                div.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="leading-relaxed pr-2">${opt}</span>
+                    </div>
+                    <div class="shrink-0 font-bold">${iconSymbol}</div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById("review-explanation").innerText = q.desc;
+
+            // Nav Setup for Reviews Logic Block
+            document.getElementById("btn-review-prev").disabled = (reviewIdx === 0);
+            if(reviewIdx === wrongIndices.length - 1) {
+                document.getElementById("btn-review-next").innerText = "오답학습 완료 및 확인 🏁";
+                document.getElementById("btn-review-next").className = "w-2/3 bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition-all shadow-md";
+            } else {
+                document.getElementById("btn-review-next").innerText = "다음 확인 ➔";
+                document.getElementById("btn-review-next").className = "w-2/3 bg-red-500 text-white font-bold py-3 rounded-xl hover:bg-red-600 transition-all shadow-md";
+            }
+        }
+
+        function prevReview() {
+            if(reviewIdx > 0) {
+                reviewIdx--;
+                renderReviewSlide();
+            }
+        }
+
+        function nextReview() {
+            if(reviewIdx < wrongIndices.length - 1) {
+                reviewIdx++;
+                renderReviewSlide();
+            } else {
+                // Completed parsing the loop entirely, release restriction locks
+                hasCompletedReview = true;
+                showFinalScreen();
+            }
+        }
+
+        // Show Final Dashboard Option Selection Screen
+        function showFinalScreen() {
+            document.getElementById("screen-review").classList.add("hidden");
+            document.getElementById("screen-final").classList.remove("hidden");
+
+            document.getElementById("tl-step-4").className = "absolute -left-[31px] top-0 bg-orange-point text-white w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]";
+            
+            // Adjust conditional toggle parameters block handling subset empty constraints
+            if(wrongIndices.length === 0) {
+                document.getElementById("btn-retest-wrong").style.display = "none";
+            } else {
+                document.getElementById("btn-retest-wrong").style.display = "block";
+            }
+        }
+
+        // Subset Filter Retry Strategy (Wrong Only Re-Test Engine)
+        function startRetestWrongOnly() {
+            if(!hasCompletedReview) return;
+            
+            // Re-compose dynamic temporary sub-arrays mapping directly from index pointers
+            const nextRoundSubset = [];
+            wrongIndices.forEach(idx => {
+                nextRoundSubset.push(quizQuestions[idx]);
+            });
+
+            quizQuestions = nextRoundSubset;
+            currentQuestionIdx = 0;
+            userAnswers = {};
+            mode = "exam";
+
+            document.getElementById("screen-final").classList.add("hidden");
+            document.getElementById("screen-exam").classList.remove("hidden");
+            renderQuestion();
+        }
+
+        // Refresh and Reset Back to Absolute Standard Baseline 50 questions format
+        function startRetestAll() {
+            quizQuestions = [...originalQuestionBank];
+            currentQuestionIdx = 0;
+            userAnswers = {};
+            mode = "exam";
+            hasCompletedReview = false;
+
+            // Reset Timeline elements look inside DOM tree
+            document.getElementById("tl-step-2").className = "absolute -left-[31px] top-0 bg-gray-300 text-gray-600 w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]";
+            document.getElementById("tl-step-3").className = "absolute -left-[31px] top-0 bg-gray-300 text-gray-600 w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]";
+            document.getElementById("tl-step-4").className = "absolute -left-[31px] top-0 bg-gray-300 text-gray-600 w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px]";
+
+            document.getElementById("screen-final").classList.add("hidden");
+            document.getElementById("screen-exam").classList.remove("hidden");
+            renderQuestion();
+        }
+    </script>
+</body>
+</html>
